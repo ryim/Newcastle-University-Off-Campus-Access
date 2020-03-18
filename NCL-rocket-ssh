@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#   Specify the hosts
+#   Host1 is AIDAN. The IP is hard coded just in case unix.ncl.ac.uk starts
+#   pointing the SSH client at different servers with different RSA keys, and
+#   SSH thinks there's a Man-in-the-Middle attack in progress.
+HOST1=USERNAME@128.240.212.95
+HOST2=rocket.hpc.ncl.ac.uk
+
+#   The command which forwards Port 4567 on your machine to Port 22 on Aidan
+#   for 10 minutes
+ssh -o ControlMaster=yes \
+    -o ControlPersist=600 \
+    -o ControlPath=/tmp/ssh-%u-%h-%p-%r \
+    -Nf \
+    -L 4567:$HOST2:22 $HOST1
+

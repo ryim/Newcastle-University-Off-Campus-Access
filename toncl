@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+
+#   Set up help string
+my $helpstring = 
+    "Usage: toncl <-o /output/dir/on/Rocket> <File1> [file2] ...\n"
+    ."E.G.: toncl file.txt file2.txt -o /mnt/nfs/home/nry13\n\n"
+;
+
+################################################################################
+#   Get options
+my $help = 0;
+my $out;
+GetOptions(
+            "h|help" => \$help,
+            "o|out=s" => \$out,
+);
+
+#   If help is requested, send it.
+if ($help == 1) {
+    print $helpstring;
+    exit(0);
+}
+
+#   General idiotproofing
+if (!$out || !@ARGV) {
+	print "Need to specify input file(s)/directories and destination.\n\n"
+        ."$helpstring"
+    ;
+	exit(1);
+}
+
+#   Perform the SCP command
+system("scp -r -P 4567 " . join(" ", @ARGV) . " nry13\@localhost:$out");

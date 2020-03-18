@@ -18,3 +18,14 @@ This repository is aimed at users of the Unix resources at Newcastle University.
    ```
 
 # Transferring files directly from your home Linux machine onto Rocket
+Rocket does not accept SSH connections from elsewhere on the internet. In order to get around this, it is necessary to tunnel your SSH connection through AIDAN, since the AIDAN server is able to connect to Rocket. The `NCL-rocket-ssh` script sets this tunnel up for 10 minutes, so that you can use the `toncl` script to send files to Rocket through the tunnel.
+
+By default, the tunnel is active for 10 minutes. If you need to transfer larger amounts of data through to Rocket, edit the `NCL-rocket-ssh` script, and replace `ControlPersist=600` with a larger number in seconds.
+
+The following instructions will get you started with transferring files. It is useful to send a test file over, and to check that everything is there.
+
+1. Download the `toncl` and `NCL-rocket-ssh` scripts.
+1. Open `NCL-rocket-ssh` in a text editor, and replace `USERNAME` with your Newcastle University username.
+1. Run `./NCL-rocket-ssh` to start your 10 minute file transfer window.
+1. Run `./toncl -h` to get usage information
+1. Run `./toncl` to transfer files directly to Rocket.
