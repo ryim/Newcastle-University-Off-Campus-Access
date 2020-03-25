@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+
+#   Set up help string
+my $helpstring = 
+    "Usage: rocketscp <-m (in/out)> <-o destination> <file1> [file2] ...\n"
+    ."Note: <file1> can be replaced by paths, to transfer the whole directory."
+    ."\n"
+    ."Examples\n===============================\n"
+    ."Transferring from this machine to Rocket\n"
+    ."rocketscp in file.txt -o /mnt/nfs/home/username\n\n"
+    ."Transferring from Rocket to this machine\n"
+    ."rocketscp out file.xls file2.txt -o /home/username/destination\n\n"
+;
+
+#   Define variables to store command line options in
+my $help = 0;
+my $out;
+my $mode;       # 0=from localhost to Rocket, 1=from Rocket to localhost
+#   Get command line options
+GetOptions(
+            "h|help" => \$help,
+            "o|out=s" => \$out,
+            "m|mode=s" => \$mode
+);
+
+#   If help is requested, send it.
+if ($help == 1) {
+    print $helpstring;
+    exit(0);
+}
+
+#   General idiotproofing
+if (!$out || !@ARGV || !$mode) {
+	print "Error: Need to specify a file to move, a mode, and destination.\n\n"
+        ."$helpstring"
+    ;
+	exit(1);
+}
+elsif ($mode !~ m/out|in/i) {
+	print "Unrecognised mode: $mode\n"
+        ."Mode must either be 'in' or 'out'.\n\n"
+        ."$helpstring"
+    ;
+	exit(1);
+}
+
+#   Perform the SCP command depending on the mode (into Rocket, or out of...)
+if ($mode =~ m/in/i) {
+    system("scp -r -P 4567 " . join(" ", @ARGV) . " nry13\@localhost:$out");
+}
+elsif ($mode =~ m/out/i) {
+    system("scp -r -P 4567 nry13\@localhost:" 
+        . join(" nry13\@localhost:", @ARGV) 
+        . " $out"
+    );
+}
