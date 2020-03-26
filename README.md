@@ -39,3 +39,6 @@ For other shells, add this line to the appropriate script which runs when you st
    PATH="/path/to/scripts:${PATH}"; export PATH;
    ```
    Now, you can run `NCL-rocket-ssh` or `rocketscp` from anywhere on your system without having to type the whole path out.
+
+## Licensing
+Please see the "LICENSE" file distributed alongside this file for licensing information.

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#   Please see the "LICENSE" file distributed alongside this file for licensing
+#   information.
+
 #   Specify the hosts
 #   Host1 is AIDAN. The IP is hard coded just in case unix.ncl.ac.uk starts
 #   pointing the SSH client at different servers with different RSA keys, and

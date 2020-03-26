@@ -1,10 +1,14 @@
 #!/usr/bin/perl
+
+#   Please see the "LICENSE" file distributed alongside this file for licensing
+#   information.
+
 use warnings;
 use strict;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 
-#   Set up help string
+#   Set up help string. This is what's printed if there are errors.
 my $helpstring = 
     "Usage: rocketscp <-m (in/out)> <-o destination> <file1> [file2] ...\n"
     ."Note: <file1> can be replaced by paths, to transfer the whole directory."
@@ -18,8 +22,9 @@ my $helpstring =
 
 #   Define variables to store command line options in
 my $help = 0;
-my $out;
-my $mode;       # 0=from localhost to Rocket, 1=from Rocket to localhost
+my $out;        # The destination file
+my $mode;       # in=from localhost to Rocket, out=from Rocket to localhost
+
 #   Get command line options
 GetOptions(
             "h|help" => \$help,
@@ -27,13 +32,13 @@ GetOptions(
             "m|mode=s" => \$mode
 );
 
-#   If help is requested, send it.
+#   If help is requested in the command line options, send it.
 if ($help == 1) {
     print $helpstring;
     exit(0);
 }
 
-#   General idiotproofing
+#   General idiotproofing of command line inputs
 if (!$out || !@ARGV || !$mode) {
 	print "Error: Need to specify a file to move, a mode, and destination.\n\n"
         ."$helpstring"
@@ -48,7 +53,7 @@ elsif ($mode !~ m/out|in/i) {
 	exit(1);
 }
 
-#   Perform the SCP command depending on the mode (into Rocket, or out of...)
+#   Perform the SCP command depending on the mode (into Rocket, or out of it)
 if ($mode =~ m/in/i) {
     system("scp -r -P 4567 " . join(" ", @ARGV) . " nry13\@localhost:$out");
 }
