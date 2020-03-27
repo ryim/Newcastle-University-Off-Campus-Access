@@ -29,6 +29,7 @@ The following instructions will get you started with transferring files. It is u
 
 1. Download the `rocketscp` and `NCL-rocket-ssh` scripts.
 1. Open `NCL-rocket-ssh` in a text editor, and replace `USERNAME` with your Newcastle University username.
+1. Open `rocketscp` in a text editor, and replace `nry13` on line 10 with your Newcastle University username.
 1. Run `./NCL-rocket-ssh` to start your 10 minute file transfer window.
 1. Run `./rocketscp -h` to get usage information
 1. Run `./rocketscp` to transfer files to/from Rocket.

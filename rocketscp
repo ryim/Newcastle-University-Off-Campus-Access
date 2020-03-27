@@ -7,6 +7,7 @@ use warnings;
 use strict;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
+my $username = "nry13";
 
 #   Set up help string. This is what's printed if there are errors.
 my $helpstring = 
@@ -55,11 +56,11 @@ elsif ($mode !~ m/out|in/i) {
 
 #   Perform the SCP command depending on the mode (into Rocket, or out of it)
 if ($mode =~ m/in/i) {
-    system("scp -r -P 4567 " . join(" ", @ARGV) . " nry13\@localhost:$out");
+    system("scp -r -P 4567 " . join(" ", @ARGV) . " $username\@localhost:$out");
 }
 elsif ($mode =~ m/out/i) {
-    system("scp -r -P 4567 nry13\@localhost:" 
-        . join(" nry13\@localhost:", @ARGV) 
+    system("scp -r -P 4567 $username\@localhost:" 
+        . join(" $username\@localhost:", @ARGV) 
         . " $out"
     );
 }
