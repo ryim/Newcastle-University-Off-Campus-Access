@@ -16,9 +16,9 @@ my $helpstring =
     ."\n"
     ."Examples\n===============================\n"
     ."Transferring from this machine to Rocket\n"
-    ."rocketscp in file.txt -o /mnt/nfs/home/username\n\n"
+    ."rocketscp -m in file.txt -o /mnt/nfs/home/username\n\n"
     ."Transferring from Rocket to this machine\n"
-    ."rocketscp out file.xls file2.txt -o /home/username/destination\n\n"
+    ."rocketscp -m out file.xls file2.txt -o /home/username/destination\n\n"
 ;
 
 #   Define variables to store command line options in
