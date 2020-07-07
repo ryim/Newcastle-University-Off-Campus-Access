@@ -3,11 +3,30 @@
 #   Please see the "LICENSE" file distributed alongside this file for licensing
 #   information.
 
+
+################################################################################
+#                                Username here                                 #
+#                               ===============                                #
+my $username = "USERNAME";
+#                                                                              #
+################################################################################
+
+
+################################################################################
+#   Section for pragmas, options parsing, idiotproofing, etc.
+################################################################################
+
 use warnings;
 use strict;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
-my $username = "nry13";
+use FindBin;
+
+#   Global variables
+(my $rootdir = $FindBin::RealBin) =~ s/(.*\/).*?$/$1/;  # Locate root dir
+my $sshport = 4567;
+my $host1='nry13@unix.ncl.ac.uk';
+my $host2='rocket.hpc.ncl.ac.uk';
 
 #   Set up help string. This is what's printed if there are errors.
 my $helpstring = 
@@ -33,7 +52,7 @@ GetOptions(
             "m|mode=s" => \$mode
 );
 
-#   If help is requested in the command line options, send it.
+#   If help is requested in the command line options, give it.
 if ($help == 1) {
     print $helpstring;
     exit(0);
@@ -54,9 +73,41 @@ elsif ($mode !~ m/out|in/i) {
 	exit(1);
 }
 
+################################################################################
+#   Checking for an active SSH tunnel, and starting one if there isn't one
+################################################################################
+
+#   $exitcode is 0 if an active process is found
+my $exitcode = system("ps aux "
+                        ."| grep -v grep "
+                        ."| grep \'$sshport:$host2:22\' > /dev/null"
+               );
+
+#   If no active process is found, start one
+if ($exitcode != 0) {
+
+    print "No active port forwarding tunnel found. Starting tunnel.\n";
+
+    #   The command which forwards a port on your machine to Port 22 on Aidan
+    #   for 10 minutes
+    system("ssh -o ControlMaster=yes "
+        ."-o ControlPersist=600 "
+        ."-o ControlPath=/tmp/ssh-%u-%h-%p-%r "
+        ."-Nf "
+        ."-L $sshport:$host2:22 $host1"
+    );
+}
+
+################################################################################
+#   The scp command
+################################################################################
+
 #   Perform the SCP command depending on the mode (into Rocket, or out of it)
 if ($mode =~ m/in/i) {
-    system("scp -r -P 4567 " . join(" ", @ARGV) . " $username\@localhost:$out");
+    system("scp -r -P ${sshport} " 
+            . join(" ", @ARGV) 
+            . " $username\@localhost:$out"
+    );
 }
 elsif ($mode =~ m/out/i) {
     system("scp -r -P 4567 $username\@localhost:" 
