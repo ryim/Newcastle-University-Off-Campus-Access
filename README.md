@@ -39,7 +39,7 @@ For other shells, add this line to the appropriate script which runs when you st
    ```
    Now, you can run `rocketscp` from anywhere on your system without having to type the whole path out.
 
-Note: It's a pain to type your password in twice whenever you want to transfer files, but this is the way the technology works. To avoid this, you can set up RSA keys to do this (tutorial available at: https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys--2). Newcastle University has recently changed its policy on RSA keys, so make sure that your key setup complies with their up-to-date guidelines.
+Note: It's a pain to type your password in twice whenever you want to transfer files, but this is the way the technology works. To avoid this, you can set up RSA key pairs (tutorial available at: https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys--2). Newcastle University has recently changed its policy on RSA keys, so make sure that your key setup complies with their up-to-date guidelines.
 
 ## Licensing
 Please see the "LICENSE" file distributed alongside this file for licensing information.
