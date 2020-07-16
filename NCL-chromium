@@ -6,7 +6,7 @@
 ################################################################################
 #                                                                              #
 #   Global variables
-uname='nry13'
+uname='USERNAME'
 socksport=8956
 server='unix.ncl.ac.uk'
 
