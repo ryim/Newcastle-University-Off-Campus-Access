@@ -2,6 +2,25 @@
 
 This repository is aimed at users of the Unix resources at Newcastle University. Please distribute to anyone who could need it. Please report any issues via Github or by emailing richard.yim@newcastle.ac.uk. Any other comments are also welcome through these channnels.
 
+## Accessing papers via Newcastle University's resources, without using RAS/Remote Desktop
+Many journals and publishers restrict access to institutions/individuals who have subscriptions. NU has one. Accessing these papers by launching a browser in RAS or Remote Desktop is possible, but both of those options can be sluggish and annoying to use. There is a way of routing the traffic to/from a browser through a server at NU, so that it appears to the publishers that you are on campus.
+
+On Windows, Part 2 of the following guide may help: `https://www.ocf.berkeley.edu/~xuanluo/sshproxywin.html`
+
+### NCL-chromium
+For Linux users, the `NCL-chromium` Bash script, included in this repository, will automate the process of setting up a tunnel to AIDAN, one of NU's servers, and launch an instance of Chrome/Chromium with the appropriate options. This script has the advantage of tunnelling only a single browser's traffic through your university connection, rather than all of the traffic from your machine. This is an early version of this script, so feedback is greatly appreciated.
+
+#### Prerequisites
+`NCL-chromium` requires that at least one of: Chrome, Chromium, or Chromium Browser Privacy is installed, and is launchable from the terminal using one of the following commands: `"chromium-browser-privacy", "chromium-browser", "chromium", "chrome"`.
+
+#### Usage
+1. Download a copy of NCL-chromium
+1. Open it in a text editor. Replace `nry13` on line 9 with your NU username, then save it.
+1. Navigate to the location of NCL-chromium in your terminal, and launch the script with `./NCL-chromium`
+1. Enter your NU password during SOCKS tunnel setup. The browser should launch automatically.
+
+Once this is done, the script will create a process in the background. This process checks to see if the browser is still running, once a minute. If the browser is closed, then the process will kill the SOCKS tunnel without you having to do anything.
+
 ## Accessing Rocket via an SSH connection from outside the university
 1. Get access to an SSH client or a unix terminal. Examples are available below.
    * There is an SSH client in RAS `https://services.ncl.ac.uk/itservice/core-services/software/ras/`

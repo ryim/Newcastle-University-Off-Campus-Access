@@ -1,0 +1,113 @@
+#!/bin/bash
+
+#   Please see the "LICENSE" file distributed alongside this file for licensing
+#   information.
+
+################################################################################
+#                                                                              #
+#   Global variables
+uname='nry13'
+socksport=8956
+server='unix.ncl.ac.uk'
+
+#                                                                              #
+################################################################################
+
+#   Define the command to activate the SOCKS tunnel. This is done because I
+#   search for the command in 'ps' to make sure I don't start tunnels twice.
+#   I also monitor for the Chromium process which uses this SOCKS tunnel, and
+#   close the tunnel when Chromium is closed.
+sockscmd="ssh -o ServerAliveInterval=300"
+sockscmd+=" -D $socksport -f -C -q -N $uname@$server"
+
+#   Find a version of Chrome/Chromium that's installed and not open
+chromapp=''
+open=false
+apps=("chromium-browser-privacy" "chromium-browser" "chromium" "chrome")
+for app in ${apps[@]}
+do
+    if command -v $app > /dev/null
+    then
+        echo "Found $app"
+
+        if ps aux | grep -v grep | grep -q $app
+        then
+            echo "$app is open. Trying other apps."
+            open=true
+            continue
+        fi
+
+        chromapp=$app
+        break
+    fi
+done
+
+#   If there's no version of Chrome/Chromium that's accessible from the cmd
+#   list, throw an error and exit. If there is no open app, throw a different
+#   error, and exit
+if [ -z $chromapp ]
+then
+    if [ $open = true ]
+    then
+        echo "Error: A version of Chrome/Chromium was found, but was already"
+        echo "open. Please close it to allow traffic to be routed through the"
+        echo "SOCKS tunnel."
+        exit 2
+    else
+        echo "Error: These commands to launch Chromium/Chrome do not work:"
+        echo ${apps[@]}
+        echo "Please install one of the above, and ensure that it is launchable"
+        echo "from this terminal using one of these commands."
+        exit 2
+    fi
+fi
+
+#   Check if the SOCKS tunnel is already running
+if ps aux \
+    | grep -v 'grep' \
+    | grep -q "$sockscmd" 
+then
+    #   If the SOCKS tunnel is already running, do nothing
+    echo "SOCKS tunnel already running."
+else
+    #   If the SOCKS tunnel isn't running, start the tunnel
+    echo "SOCKS tunnel inactive. Starting tunnel."
+    $sockscmd
+fi
+
+#   Start Chromium with all the bells and whistles
+echo "Starting $chromapp, directing traffic through the SOCKS tunnel."
+
+$chromapp \
+    --proxy-server="socks5://localhost:${socksport}" \
+    --host-resolver-rules="MAP * ~NOTFOUND , EXCLUDE localhost" \
+    >/dev/null 2>&1 &
+
+################################################################################
+#                                                                              #
+#   Monitor the Chromium/Chrome process, and close the SOCKS tunnel if the
+#   process isn't running
+
+echo "Within a minute of $chromapp closing, the SOCKS tunnel will be closed."
+
+#   While the SOCKS tunnel is running
+while ps aux | grep -v grep | grep -q "$sockscmd"
+do
+
+    #   If a chrome/chromium process isn't running through a SOCKS tunnel, kill
+    #   the tunnel
+    if ! ps aux | grep -v grep | grep -iq ${chromapp}.*socks.*${socksport}
+    then
+        echo "NCL-chromium: The browser using the SOCKS tunnel has been closed."
+        echo "NCL-chromium: Killing SOCKS tunnel"
+        ps aux \
+            | grep -v grep \
+            | grep "$sockscmd" \
+            | awk '{print $2}' \
+            | xargs kill
+        exit 0
+    fi
+
+    #   If Chrome/Chromium is still running, check back in a minute
+    sleep 1m
+done &
