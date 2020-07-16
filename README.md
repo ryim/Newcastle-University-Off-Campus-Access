@@ -1,4 +1,4 @@
-# Temporary Newcastle University Unix Resource Access
+# Newcastle University Off Campus Access
 
 This repository is aimed at users of the Unix resources at Newcastle University. Please distribute to anyone who could need it. Please report any issues via Github or by emailing richard.yim@newcastle.ac.uk. Any other comments are also welcome through these channnels.
 
