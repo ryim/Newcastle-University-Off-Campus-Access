@@ -1,11 +1,11 @@
-# Newcastle University Off Campus Access
+# Newcastle University Off-Campus Access
 
-This repository is aimed at users of the Unix resources at Newcastle University. Please distribute to anyone who could need it. Please report any issues via Github or by emailing richard.yim@newcastle.ac.uk. Any other comments are also welcome through these channnels.
+This is an UNOFFICIAL repository/guide, aimed at enabling staff/students at Newcastle University to work off-campus more effectively. Please distribute to anyone who could need it. Please report any issues via Github or by emailing richard.yim@newcastle.ac.uk. Any other comments are also welcome through these channnels.
 
 ## Accessing journal articles through Newcastle University's systems, without using RAS/Remote Desktop
 Many journals and publishers restrict full text access to institutions/individuals who have subscriptions. NU has subscriptions to most major journals, and as a member of staff/a student at NU, you have access as well. Accessing these papers by launching a browser in RAS or Remote Desktop is possible, but both of those options can be sluggish and annoying to use. There is a way of routing the traffic to/from a browser on your computer through a server at NU, so that it appears to the publishers that you are on campus.
 
-On Windows, Part 2 of the following guide may help: `https://www.ocf.berkeley.edu/~xuanluo/sshproxywin.html`
+On Windows, Part 2 of the following guide may help: `https://www.ocf.berkeley.edu/~xuanluo/sshproxywin.html`.
 
 ### NCL-chromium
 For Linux users, the `NCL-chromium` Bash script, included in this repository, will automate the process of setting up a tunnel to AIDAN, one of NU's servers, and launch an instance of Chrome/Chromium with the appropriate options. This script has the advantage of tunnelling only a single browser's traffic through your university connection, rather than all of the traffic from your device. This is an early version of this script, so feedback is greatly appreciated.

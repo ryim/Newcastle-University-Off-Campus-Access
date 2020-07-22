@@ -25,7 +25,7 @@ use FindBin;
 #   Global variables
 (my $rootdir = $FindBin::RealBin) =~ s/(.*\/).*?$/$1/;  # Locate root dir
 my $sshport = 4567;
-my $host1='nry13@unix.ncl.ac.uk';
+my $host1="${username}\@unix.ncl.ac.uk";
 my $host2='rocket.hpc.ncl.ac.uk';
 
 #   Set up help string. This is what's printed if there are errors.
