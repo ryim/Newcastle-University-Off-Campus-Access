@@ -3,11 +3,28 @@
 This is an UNOFFICIAL repository/guide, aimed at enabling staff/students at Newcastle University to work off-campus more effectively. Please distribute to anyone who could need it. Please report any issues via Github or by emailing richard.yim@newcastle.ac.uk. Any other comments are also welcome through these channnels.
 
 ## Accessing journal articles through Newcastle University's systems, without using RAS/Remote Desktop
-Many journals and publishers restrict full text access to institutions/individuals who have subscriptions. NU has subscriptions to most major journals, and as a member of staff/a student at NU, you have access as well. Accessing these papers by launching a browser in RAS or Remote Desktop is possible, but both of those options can be sluggish and annoying to use. There is a way of routing the traffic to/from a browser on your computer through a server at NU, so that it appears to the publishers that you are on campus.
+Many journals and publishers restrict full text access to institutions/individuals who have subscriptions.
+NU has subscriptions to most major journals, and as a member of staff/a student at NU, you have access as well.
+Accessing these papers by launching a browser in RAS or Remote Desktop is possible, but both of those options can be sluggish and annoying to use.
+There is a way of routing the traffic to/from a browser on your computer through a server at NU, so that it appears to the publishers that you are on campus.
 
+### Windows users - Tunnelling your browser traffic through Newcastle University
+The idea is to set up a SOCKS tunnel between your device and a server at NU, through which your web traffic can travel.
+You then set your browser up to run through this tunnel.
+According to the publishers' websites, your device is on the NU campus (your external IP address is an NU address), so they will serve you content without showing you the paywall.
+
+1. Download and install PuTTY from `putty.org`.
+1. Launch PuTTY from the Start Menu.
+1. Go to `https://linuxize.com/post/how-to-setup-ssh-socks-tunnel-for-private-browsing/`. a fifth of the way down the page, there is a section entitled "Windwos". This will walk you through setting up your connection to any server. 
+    1. In step 1 of the guide, use `unix.ncl.ac.uk` in the Host "Name/IP address" field.
+    1. Follow the rest of the guide to set your tunnel up, and configure your browser to use the tunnel.
+    1. When you are finished, don't forget to reset any browser settings, so that you can use your browser normally in future.
+    1. Finally, close PuTTY.
+<!---
 On Windows, Part 2 of the following guide may help: `https://www.ocf.berkeley.edu/~xuanluo/sshproxywin.html`.
+-->
 
-### NCL-chromium
+### Accessing articles from Linux machines using NCL-chromium
 For Linux users, the `NCL-chromium` Bash script, included in this repository, will automate the process of setting up a tunnel to AIDAN, one of NU's servers, and launch an instance of Chrome/Chromium with the appropriate options. This script has the advantage of tunnelling only a single browser's traffic through your university connection, rather than all of the traffic from your device. This is an early version of this script, so feedback is greatly appreciated.
 
 #### Prerequisites
