@@ -13,9 +13,9 @@ The idea of this process is to set up a SOCKS tunnel between your device and a s
 You set your browser up to send all of its traffic through this tunnel to an NU server, and the server then forwards the traffic out to the internet.
 According to the publishers' websites, your device is on the NU campus (your external IP address is an NU address), so they will serve you content without showing you the paywall.
 
-1. Download and install PuTTY from `putty.org`.
+1. Download and install PuTTY from https://www.putty.org.
 1. Launch PuTTY from the Start Menu.
-1. Go to `https://linuxize.com/post/how-to-setup-ssh-socks-tunnel-for-private-browsing/`. a fifth of the way down the page, there is a section entitled "Windows". This will walk you through setting up your tunnel to any server. 
+1. Go to https://linuxize.com/post/how-to-setup-ssh-socks-tunnel-for-private-browsing/. a fifth of the way down the page, there is a section entitled "Windows". This will walk you through setting up your tunnel to any server. 
     1. In step 1 of the guide, use `unix.ncl.ac.uk` in the Host "Name/IP address" field.
     1. Follow the rest of the guide to set your tunnel up, and configure your browser to use the tunnel.
     1. When you are finished, don't forget to reset any browser settings, so that you can use your browser normally in future.
