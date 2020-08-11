@@ -59,8 +59,8 @@ Rocket does not accept SSH connections from elsewhere on the internet.
 In order to get around this, it is necessary to tunnel your SSH connection through AIDAN, since the AIDAN server is able to connect to Rocket and accepts connections from machines not on Newcastle University's network.
 The `rocketscp` script allows you to create an SSH tunnel, and to move files to/from Rocket through the tunnel.
 
-By default, the tunnel is active for 10 minutes.
-If you need to transfer larger amounts of data through to/from Rocket than 10 min will allow, edit the `rocketscp` script, and replace `ControlPersist=600`, on line 94, with a larger number in seconds.
+By default, the tunnel is active for 30 minutes.
+If you need to transfer larger amounts of data through to/from Rocket than 30 min will allow, edit the `rocketscp` script, and replace `ControlPersist=1800`, on line 94, with a larger number in seconds.
 
 The following instructions will get you started with transferring files. It is useful to send a test file over, and to check that it arrived okay.
 

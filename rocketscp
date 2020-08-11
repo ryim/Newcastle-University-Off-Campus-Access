@@ -91,7 +91,8 @@ if ($exitcode != 0) {
     #   The command which forwards a port on your machine to Port 22 on Aidan
     #   for 10 minutes
     system("ssh -o ControlMaster=yes "
-        ."-o ControlPersist=600 "
+        ."-o ControlPersist=1800 "
+        ."-o ServerAliveInterval=300"
         ."-o ControlPath=/tmp/ssh-%u-%h-%p-%r "
         ."-Nf "
         ."-L $sshport:$host2:22 $host1"
@@ -102,6 +103,9 @@ if ($exitcode != 0) {
 #   The scp command
 ################################################################################
 
+#   Logging
+print "Initiating transfer. Enter Newcastle University password.\n";
+
 #   Perform the SCP command depending on the mode (into Rocket, or out of it)
 if ($mode =~ m/in/i) {
     system("scp -r -P ${sshport} " 
@@ -110,7 +114,7 @@ if ($mode =~ m/in/i) {
     );
 }
 elsif ($mode =~ m/out/i) {
-    system("scp -r -P 4567 $username\@localhost:" 
+    system("scp -r -P $sshport $username\@localhost:" 
         . join(" $username\@localhost:", @ARGV) 
         . " $out"
     );
