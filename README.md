@@ -40,9 +40,13 @@ For Linux users, the `NCL-chromium` Bash script, included in this repository, wi
 Once this is done, the script will create a process in the background. This process checks to see if the browser is still running, once a minute. If the browser is closed, then the process will kill the SOCKS tunnel without you having to do anything.
 
 ## Accessing Rocket via an SSH connection from outside the university
+Rocket does not accept SSH connections from elsewhere on the internet, but AIDAN, one of NU's web-facing servers, does.
+One can connect to AIDAN via SSH, then SSH from AIDAN into Rocket.
+
 1. Get access to an SSH client or a unix terminal. Examples are available below.
-   * There is an SSH client in RAS `https://services.ncl.ac.uk/itservice/core-services/software/ras/`
-   * Linux Subsystem for Windows has a terminal which is capable of supporting SSH `https://www.illuminiastudios.com/dev-diaries/ssh-on-windows-subsystem-for-linux/`
+   * Preferred for Windows users: Download and install PuTTY from https://www.putty.org
+   * There is an SSH client in RAS https://services.ncl.ac.uk/itservice/core-services/software/ras/
+   * Linux Subsystem for Windows has a terminal which is capable of supporting SSH https://www.illuminiastudios.com/dev-diaries/ssh-on-windows-subsystem-for-linux/
    * Almost all Linux distributions come with SSH built in.
 1. Launch the client/terminal and enter the following, replacing `username` with your Newcastle University username.
    ```
@@ -53,6 +57,12 @@ Once this is done, the script will create a process in the background. This proc
    ```
    ssh username@rocket.hpc.ncl.ac.uk
    ```
+
+### Helpful note for UNIX/Linux users
+SSH connections from UNIX/Linux systems, using default options, tend to die if left inactive for some time.
+Using the command `ssh -o ServerAliveInterval=300` to connect to `username@server` tells the SSH process to ping the server every 5 minutes, to tell the server that the connection should be kept alive.
+Adding an alias to your shell environment setup script (e.g.: `~/.bashrc` or `~/.cshrc`) means that you won't have to type it out every time.
+For example: add `alias ssh="ssh -o ServerAliveInterval=300"` to the `~/.profile` file on AIDAN, and to `~/.bashrc` on your machine.
 
 ## Transferring files between your home Linux machine and Rocket
 Rocket does not accept SSH connections from elsewhere on the internet.
