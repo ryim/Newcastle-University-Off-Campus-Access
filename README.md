@@ -5,10 +5,14 @@ This is an UNOFFICIAL repository/guide, aimed at enabling staff/students at Newc
 ## Accessing journal articles through Newcastle University's systems, without using RAS/Remote Desktop
 Many journals and publishers restrict full text access to institutions/individuals who have subscriptions.
 NU has subscriptions to most major journals, and as a member of staff/a student at NU, you have access as well.
-Accessing these papers by launching a browser in RAS or Remote Desktop is possible, but both of those options can be sluggish and annoying to use.
+Accessing these papers by launching a browser in Remote Desktop is possible, but downloading a paper for offline use can be sluggish and annoying to use.
 There is a way of routing the traffic to/from a browser on your computer through a server at NU, so that it appears to the publishers that you are on campus.
 
 ### Windows users - Tunnelling your browser traffic through Newcastle University
+Note: NUIT will suspend/has suspended port forwarding functionality on its web-facing server at `unix.ncl.ac.uk`.
+They currently have a web form at https://forms.ncl.ac.uk/view.php?id=10175553 for requests of this functionality.
+This is necessary for the following to work.
+
 The idea of this process is to set up a SOCKS tunnel between your device and a server at NU, through which your web traffic can travel.
 You set your browser up to send all of its traffic through this tunnel to an NU server, and the server then forwards the traffic out to the internet.
 According to the publishers' websites, your device is on the NU campus (your external IP address is an NU address), so they will serve you content without showing you the paywall.
@@ -25,6 +29,10 @@ On Windows, Part 2 of the following guide may help: `https://www.ocf.berkeley.ed
 -->
 
 ### Accessing articles from Linux machines using NCL-chromium
+Note: NUIT will suspend/has suspended port forwarding functionality on its web-facing server at `unix.ncl.ac.uk`.
+They currently have a web form at https://forms.ncl.ac.uk/view.php?id=10175553 for requests of this functionality.
+This is necessary for the following to work.
+
 For Linux users, the `NCL-chromium` Bash script, included in this repository, will automate the process of setting up a tunnel to AIDAN, one of NU's servers, and launch an instance of Chrome/Chromium with the appropriate options. This script has the advantage of tunnelling only a single browser's traffic through your university connection, rather than all of the traffic from your device. This is an early version of this script, so feedback is greatly appreciated.
 
 #### Prerequisites
@@ -73,6 +81,10 @@ By default, the tunnel is active for 30 minutes.
 If you need to transfer larger amounts of data through to/from Rocket than 30 min will allow, edit the `rocketscp` script, and replace `ControlPersist=1800`, on line 94, with a larger number in seconds.
 
 The following instructions will get you started with transferring files. It is useful to send a test file over, and to check that it arrived okay.
+
+Note: NUIT will suspend/has suspended port forwarding functionality on its web-facing server at `unix.ncl.ac.uk`.
+They currently have a web form at https://forms.ncl.ac.uk/view.php?id=10175553 for requests of this functionality.
+This is necessary for the following to work.
 
 1. Download the `rocketscp` script.
 1. Open `rocketscp` in a text editor, and replace `USERNAME`, on line 10, with your Newcastle University username.

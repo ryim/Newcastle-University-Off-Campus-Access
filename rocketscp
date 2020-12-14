@@ -89,7 +89,7 @@ if ($exitcode != 0) {
     print "No active port forwarding tunnel found. Starting tunnel.\n";
 
     #   The command which forwards a port on your machine to Port 22 on Aidan
-    #   for 10 minutes
+    #   for 30 minutes
     system("ssh -o ControlMaster=yes "
         ."-o ControlPersist=1800 "
         ."-o ServerAliveInterval=300 "
@@ -104,7 +104,8 @@ if ($exitcode != 0) {
 ################################################################################
 
 #   Logging
-print "Initiating transfer. Enter Newcastle University password.\n";
+print "Initiating transfer.\n"
+    ."Enter Newcastle University password at the following prompt.\n";
 
 #   Perform the SCP command depending on the mode (into Rocket, or out of it)
 if ($mode =~ m/in/i) {
