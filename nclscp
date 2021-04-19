@@ -23,10 +23,11 @@ Getopt::Long::Configure ("bundling");
 use FindBin;
 
 #   Global variables
-(my $rootdir = $FindBin::RealBin) =~ s/(.*\/).*?$/$1/;  # Locate root dir
+my $rootdir = $FindBin::RealBin;  # Locate root dir
 my $sshport;
 my $host1="${username}\@unix.ncl.ac.uk";
-#my $host2='rocket.hpc.ncl.ac.uk';
+my %activetunnels;
+my %othertunnels;
 
 #   Set up help string. This is what's printed if there are errors.
 my $helpstring = 
@@ -38,6 +39,7 @@ my $helpstring =
     ."rocketscp -m in file.txt -o /mnt/nfs/home/username\n\n"
     ."Transferring from Rocket to this machine\n"
     ."rocketscp -m out file.xls file2.txt -o /home/username/destination\n\n"
+    ."server names, and their aliases are kept in the nclscp.config file.\n\n"
     ."OPTIONS\n"
     ."\t-h\n\t\tPrint this help text.\n\n"
     ."\t-m | --mode <in/out>\n"
@@ -89,13 +91,41 @@ elsif ($mode !~ m/out|in/i) {
 }
 
 ################################################################################
+#   Read through the config file, if it's in its proper place. Resolve aliases 
+#   into hostnames and preferred usernames.
+################################################################################
+#print "Getting config.\n";
+my $configfile = "${rootdir}/nclscp.config";
+if (-e $configfile) {
+    open(my $configfh, "<", $configfile);
+    foreach my $line (<$configfh>) {
+        next if ($line =~ m/^\#/);
+#        print $line;
+        chomp $line;
+        my ($alias, $hostname, $prefuname) = split(/\t/, $line);
+        if ($alias eq $host2) {
+#            print "Match: $host2\n";
+            $host2 = $hostname;
+            if ($prefuname) {
+                $tuname = $prefuname;
+            }
+            last;
+        }
+    }
+    close($configfh);
+}
+else {
+    print "Warning: nclscp.config file not found in nclscp installation dir.\n$configfile\n";
+}
+undef($configfile);
+
+################################################################################
 #   Find SSH port-forwarding tunnels to make sure none clash
 #   If an active tunnel to the target is found, store the port in $sshport, and
 #   skip the rest of the search
 ################################################################################
 
 #   Grab a list of active port forwarding tunnels that go through unix.ncl.ac.uk
-my %activetunnels;
 foreach my $line (split(/\n/, `ps aux | grep -v grep | grep 'ssh.*-L' | grep 'unix.ncl.ac.uk' | sed 's/.*\-L //'`)) {
 
     chomp $line;
@@ -110,16 +140,12 @@ foreach my $line (split(/\n/, `ps aux | grep -v grep | grep 'ssh.*-L' | grep 'un
 }
 
 #   Find other tunnels that would take up ports
-my %othertunnels;
-
 if (! $sshport) {
     foreach my $line (split(/\n/, `ps aux | grep -v grep | grep -v 'unix.ncl.ac.uk' | grep 'ssh.*-L'`)) {
 
         chomp $line;
         $line =~ s/^.*\-L\s+([\w\-\.]+?)\:.*/$1/;
         $othertunnels{$line} = 1;
-    #    print "Other: $line\n";
-    #    print "Port: $port\t Target: $target\n";
     }
 }
 
@@ -150,7 +176,7 @@ if (! $sshport) {
 #   If no active process is found, start one
 if (! $sshport) {
 
-    print "No active tunnel to target found. Starting tunnel.\n";
+    print "No active tunnel to target found.\nStarting tunnel to $host2\n";
 
     #   Pick a port with no active tunnel on it.
     $sshport = int(rand(999) + 4000);
@@ -163,7 +189,7 @@ if (! $sshport) {
     system("ssh -o ControlMaster=yes "
         ."-o ControlPersist=3600 "
         ."-o ServerAliveInterval=300 "
-        ."-o ControlPath=/tmp/ssh-%u-%h-%p-%r "
+        ."-o ControlPath=/tmp/ssh-%u-%h-%p-%r-%n "
         ."-Nf "
         ."-L $sshport:$host2:22 $host1"
     );
