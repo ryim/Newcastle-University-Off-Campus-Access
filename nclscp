@@ -1,0 +1,194 @@
+#!/usr/bin/perl
+
+#   Please see the "LICENSE" file distributed alongside this file for licensing
+#   information.
+
+
+################################################################################
+#                      Newcastle University username here                      #
+#                               ===============                                #
+my $username = "USERNAME";
+#                                                                              #
+################################################################################
+
+
+################################################################################
+#   Section for pragmas, options parsing, idiotproofing, etc.
+################################################################################
+
+use warnings;
+use strict;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use FindBin;
+
+#   Global variables
+(my $rootdir = $FindBin::RealBin) =~ s/(.*\/).*?$/$1/;  # Locate root dir
+my $sshport;
+my $host1="${username}\@unix.ncl.ac.uk";
+#my $host2='rocket.hpc.ncl.ac.uk';
+
+#   Set up help string. This is what's printed if there are errors.
+my $helpstring = 
+    "Usage: nclscp <-t server> <-m (in/out)> <-o destination> <file1> [file2] ...\n"
+    ."Note: <file1> can be replaced by paths, to transfer the whole directory."
+    ."\n"
+    ."Examples\n===============================\n"
+    ."Transferring from this machine to Rocket\n"
+    ."rocketscp -m in file.txt -o /mnt/nfs/home/username\n\n"
+    ."Transferring from Rocket to this machine\n"
+    ."rocketscp -m out file.xls file2.txt -o /home/username/destination\n\n"
+    ."OPTIONS\n"
+    ."\t-h\n\t\tPrint this help text.\n\n"
+    ."\t-m | --mode <in/out>\n"
+    ."\t\tCopy out from the target machine, or into it.\n\n"
+    ."\t-o | --out /destination/of/scp/command\n"
+    ."\t\tSpecify destination of scp command\n\n"
+    ."\t-t | --target_machine target.co.uk\n"
+    ."\t\tSpecify remote machine name or IP\n\n"
+    ."\t-u | --target_username username\n"
+    ."\t\tSpecify a different username on the target machine from your normal\n"
+    ."\t\tNewcastle University username\n\n"
+;
+
+#   Define variables to store command line options in
+my $help = 0;
+my $out;        # The destination file
+my $mode;       # in=from localhost to target, out=from target to localhost
+my $tuname = $username;
+my $host2;
+
+#   Get command line options
+GetOptions(
+            "h|help" => \$help,
+            "o|out=s" => \$out,
+            "t|target_machine=s" => \$host2,
+            "u|target_username=s" => \$tuname,
+            "m|mode=s" => \$mode
+);
+
+#   If help is requested in the command line options, give it.
+if ($help == 1) {
+    print $helpstring;
+    exit(0);
+}
+
+#   General idiotproofing of command line inputs
+if (!$out || !@ARGV || !$mode) {
+	print "Error: Need to specify a file to move, a mode, and destination.\n\n"
+        ."$helpstring"
+    ;
+	exit(1);
+}
+elsif ($mode !~ m/out|in/i) {
+	print "Unrecognised mode: $mode\n"
+        ."Mode must either be 'in' or 'out'.\n\n"
+        ."$helpstring"
+    ;
+	exit(1);
+}
+
+################################################################################
+#   Find SSH port-forwarding tunnels to make sure none clash
+#   If an active tunnel to the target is found, store the port in $sshport, and
+#   skip the rest of the search
+################################################################################
+
+#   Grab a list of active port forwarding tunnels that go through unix.ncl.ac.uk
+my %activetunnels;
+foreach my $line (split(/\n/, `ps aux | grep -v grep | grep 'ssh.*-L' | grep 'unix.ncl.ac.uk' | sed 's/.*\-L //'`)) {
+
+    chomp $line;
+    $line =~ s/^([\w\-\.\:]+)\s.*/$1/;
+    my ($port, $target) = split(/\:/, $line);
+    $activetunnels{$port} = $target;
+    
+    if ($target eq $host2) {
+        $sshport = $port;
+        last;
+    }
+}
+
+#   Find other tunnels that would take up ports
+my %othertunnels;
+
+if (! $sshport) {
+    foreach my $line (split(/\n/, `ps aux | grep -v grep | grep -v 'unix.ncl.ac.uk' | grep 'ssh.*-L'`)) {
+
+        chomp $line;
+        $line =~ s/^.*\-L\s+([\w\-\.]+?)\:.*/$1/;
+        $othertunnels{$line} = 1;
+    #    print "Other: $line\n";
+    #    print "Port: $port\t Target: $target\n";
+    }
+}
+
+#   Logging
+if (! $sshport) {
+    if (%activetunnels) {
+        print "Found active tunnels through unix.ncl.ac.uk:\n";
+        foreach my $key (keys(%activetunnels)) {
+            print "Port: $key\tMachine: $activetunnels{$key}\n";
+        }
+    }
+
+    if (%othertunnels) {
+        print "Found other tunnels with the following ports:\n";
+        foreach my $key (keys(%othertunnels)) {
+            print "$key ";
+        }
+        print "\n";
+    }
+}
+
+
+################################################################################
+#   If there isn't an active tunnel to the target, find a port without a tunnel
+#   and start a tunnel there
+################################################################################
+
+#   If no active process is found, start one
+if (! $sshport) {
+
+    print "No active tunnel to target found. Starting tunnel.\n";
+
+    #   Pick a port with no active tunnel on it.
+    $sshport = int(rand(999) + 4000);
+    until (! $activetunnels{$sshport} && ! $othertunnels{$sshport}) {
+        $sshport = int(rand(999) + 4000);
+    }
+
+    #   The command which forwards a port on your machine to Port 22 on Aidan
+    #   for 1 hour
+    system("ssh -o ControlMaster=yes "
+        ."-o ControlPersist=3600 "
+        ."-o ServerAliveInterval=300 "
+        ."-o ControlPath=/tmp/ssh-%u-%h-%p-%r "
+        ."-Nf "
+        ."-L $sshport:$host2:22 $host1"
+    );
+}
+else {
+    print "Active tunnel to target found on port: $sshport\n";
+}
+
+################################################################################
+#   The scp command
+################################################################################
+
+#   Logging
+print "Starting transfer. Enter target machine's password at the prompt.\n";
+
+#   Perform the SCP command depending on the mode (into Rocket, or out of it)
+if ($mode =~ m/in/i) {
+    system("scp -r -P ${sshport} " 
+            . join(" ", @ARGV) 
+            . " $tuname\@localhost:$out"
+    );
+}
+elsif ($mode =~ m/out/i) {
+    system("scp -r -P $sshport $tuname\@localhost:\"" 
+        . join(" ", @ARGV) 
+        . "\" $out"
+    );
+}
