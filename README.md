@@ -79,6 +79,11 @@ The following instructions will get you started with transferring files. It is u
 
 1. Download the `nclscp` script and the `nclscp.config` file into the same directory.
 1. Open `nclscp.config` in a text editor, and replace `USERNAME`, on line 2, with your Newcastle University username.
+    1. Whilst you're there, you can add tab-delimited lines to define how to access various servers on the NU network.
+        - The `Alias` column is a shorthand name for the server that you can choose
+        - The `hostname` column defines the actual location of the server (for example: `rocket.hpc.ncl.ac.uk`)
+        - The `username` column is used to define usernames other than your campus username, if required. If not needed, two tabs between `hostname` and `port` to denote an empty column are fine.
+        - The `port` column is the port on your machine which you want to forward. If you choose one, please ensure that this port is not used by any other service. There is provision for `nclscp` to choose its own ports, if you leave this column blank.
 1. Run `./nclscp -h` to get usage information
 1. Run `./nclscp` to transfer files to/from Rocket.
 1. Optional: You can add the directory to which you downloaded the `nclscp` script to your $PATH in order to access them without having to specify a path to the location of these scripts.
