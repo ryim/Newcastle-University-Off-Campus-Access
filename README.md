@@ -66,7 +66,7 @@ Using the command `ssh -o ServerAliveInterval=300` to connect to `username@serve
 Adding an alias to your shell environment setup script (e.g.: `~/.bashrc` or `~/.cshrc`) means that you won't have to type it out every time.
 For example: add `alias ssh="ssh -o ServerAliveInterval=300"` to the `~/.profile` file on AIDAN, and to `~/.bashrc` on your machine.
 
-## Transferring files between your home Linux machine and a server on campus
+## Transferring files between your home Linux machine/Mac and a server on campus
 (Note: The `nclscp` script mentioned in this section replaces the `rocketscp` script, which is now in the `Archive` folder.)
 
 Rocket, and other servers on the NU network, do not accept direct SSH connections from elsewhere on the internet.
