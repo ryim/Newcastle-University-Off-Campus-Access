@@ -78,8 +78,8 @@ By default, the tunnel is active for 1 hour.
 The following instructions will get you started with transferring files. It is useful to send a test file over, and to check that it arrived okay.
 
 1. Download the `nclscp` script and the `nclscp.config` file into the same directory.
-1. Open `nclscp.config` in a text editor, and replace `USERNAME`, on line 2, with your Newcastle University username.
-    1. Whilst you're there, you can add tab-delimited lines to define how to access various servers on the NU network.
+1. Open `nclscp.config` in a text editor, and replace `USERNAME`, on line 2, with your Newcastle University username. This is necessary for logging into AIDAN.
+    1. Whilst you're there, you can add tab-delimited lines to define how to access various servers on the NU network, through AIDAN. AIDAN itself doesn't need a line in this config file.
         - The `Alias` column is a shorthand name for the server that you can choose
         - The `hostname` column defines the actual location of the server (for example: `rocket.hpc.ncl.ac.uk`)
         - The `username` column is used to define usernames other than your campus username, if required. If not needed, two tabs between `hostname` and `port` to denote an empty column are fine.
