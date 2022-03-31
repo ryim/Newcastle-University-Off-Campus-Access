@@ -69,7 +69,7 @@ For example: add `alias ssh="ssh -o ServerAliveInterval=300"` to the `~/.profile
 ## Transferring files between your home Linux machine and a server on campus
 (Note: The `nclscp` script mentioned in this section replaces the `rocketscp` script, which is now in the `Archive` folder.)
 
-Rocket, and other servers, do not accept SSH connections from elsewhere on the internet.
+Rocket, and other servers, do not accept direct SSH connections from elsewhere on the internet.
 In order to get around this, it is necessary to tunnel your SSH connection through AIDAN, since the AIDAN server is able to connect to Rocket and accepts connections from machines not on Newcastle University's network.
 The `nclscp` script allows you to create an SSH tunnel, and to move files to/from a server through the tunnel.
 
@@ -77,8 +77,8 @@ By default, the tunnel is active for 1 hour.
 
 The following instructions will get you started with transferring files. It is useful to send a test file over, and to check that it arrived okay.
 
-1. Download the `nclscp` script.
-1. Open `nclscp` in a text editor, and replace `USERNAME`, on line 10, with your Newcastle University username.
+1. Download the `nclscp` script and the `nclscp.config` file into the same directory.
+1. Open `nclscp.config` in a text editor, and replace `USERNAME`, on line 2, with your Newcastle University username.
 1. Run `./nclscp -h` to get usage information
 1. Run `./nclscp` to transfer files to/from Rocket.
 1. Optional: You can add the directory to which you downloaded the `nclscp` script to your $PATH in order to access them without having to specify a path to the location of these scripts.
@@ -90,6 +90,8 @@ For other shells, add this line to the appropriate script which runs when you st
    Now, you can run `nclscp` from anywhere on your system without having to type the whole path out.
 
 Note: It's a pain to type your password in twice whenever you want to transfer files, but this is the way the technology works. To avoid this, you can set up RSA key pairs (tutorial available at: https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys--2). Newcastle University has recently changed its policy on RSA keys, so make sure that your key setup complies with their up-to-date guidelines.
+
+The `nclscp` script automates the use of the external `scp` and `ssh` commands, and does not access or store any passwords itself.
 
 ## Licensing
 Please see the "LICENSE" file distributed alongside this file for licensing information.

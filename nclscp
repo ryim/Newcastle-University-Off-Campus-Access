@@ -3,15 +3,6 @@
 #   Please see the "LICENSE" file distributed alongside this file for licensing
 #   information.
 
-
-################################################################################
-#                      Newcastle University username here                      #
-#                               ===============                                #
-my $username = "USERNAME";
-#                                                                              #
-################################################################################
-
-
 ################################################################################
 #   Section for pragmas, options parsing, idiotproofing, etc.
 ################################################################################
@@ -24,10 +15,13 @@ use FindBin;
 
 #   Global variables
 my $rootdir = $FindBin::RealBin;  # Locate root dir
-my $sshport;
-my $host1="${username}\@unix.ncl.ac.uk";
+my $sshport = '';
 my %activetunnels;
 my %othertunnels;
+my $username = "";
+my $configchanged = 0;
+
+#   Read in the config file
 
 #   Set up help string. This is what's printed if there are errors.
 my $helpstring = 
@@ -57,15 +51,19 @@ my $helpstring =
 my $help = 0;
 my $out;        # The destination file
 my $mode;       # in=from localhost to target, out=from target to localhost
-my $tuname = $username;
+my $tuname;
 my $host2;
+my $toconfig = 0;
+my $forport;
 
 #   Get command line options
 GetOptions(
             "h|help" => \$help,
             "o|out=s" => \$out,
             "t|target_machine=s" => \$host2,
+            "p|forwarding_port=s" => \$forport,
             "u|target_username=s" => \$tuname,
+            "c|config" => \$toconfig,
             "m|mode=s" => \$mode
 );
 
@@ -95,29 +93,108 @@ elsif ($mode !~ m/out|in/i) {
 #   into hostnames and preferred usernames.
 ################################################################################
 #print "Getting config.\n";
+my @configarray;
 my $configfile = "${rootdir}/nclscp.config";
+my $aliasfound = 0;
+
 if (-e $configfile) {
     open(my $configfh, "<", $configfile);
     foreach my $line (<$configfh>) {
-        next if ($line =~ m/^\#/);
-#        print $line;
+
         chomp $line;
-        my ($alias, $hostname, $prefuname) = split(/\t/, $line);
-        if ($alias eq $host2) {
-#            print "Match: $host2\n";
+
+        #   Check for and parse primary username line. If already found one,
+        #   throw warning and only use the first one.
+        if ($line =~ m/^NCL_username\=/) {
+            
+            if ($username) {
+                print "Warning: Username already found.\n"
+                    ."Using first one: $username\n"
+                    ."Removing all subsequent username instances.\n";
+                $configchanged = 1;
+            }
+            else {
+                ($username = $line) =~ s/NCL_username\=//;
+                push(@configarray, $line);
+            }
+            next;
+        }
+        #   Ignore empty lines or comment lines, and lines after the appropriate
+        #   alias
+        elsif ($line =~ m/^\#/ || $line !~ m/\w/ || $aliasfound) {
+            push(@configarray, $line);
+            next;
+        }
+
+        #   Read config lines, check them against the target, and store.
+        my ($alias, $hostname, $prefuname, $prefport) = split(/\t/, $line);
+        if ($alias eq $host2 || $hostname eq $host2) {
+            
             $host2 = $hostname;
-            if ($prefuname) {
+            if ($prefuname && ! $tuname) {
                 $tuname = $prefuname;
             }
-            last;
+            if ($prefport && ! $forport) {
+                $forport = $prefport;
+            }
+            
+            $aliasfound = 1;
+            push(@configarray, $line);
+
+        }
+        #   If it's not  the right host, just store it.
+        else {
+            push(@configarray, $line);
         }
     }
     close($configfh);
 }
 else {
-    print "Warning: nclscp.config file not found in nclscp installation dir.\n$configfile\n";
+    print "Warning: nclscp.config file not found in nclscp installation dir.\n"
+        ."$configfile\n";
 }
-undef($configfile);
+undef($aliasfound);
+
+################################################################################
+#   Prompt the username if there isn't one, or if the -c flag used.
+#   Go through the config file and edit the file to replace the original
+#   username line with the new one.
+################################################################################
+
+if (! $username || $toconfig) {
+    print "Please input your username to unix.ncl.ac.uk.\n>";
+    $username = <STDIN>;
+    chomp $username;
+    
+    $configchanged = 1;
+    my $lineedited = 0;
+    foreach my $line (@configarray) {
+        if ($line =~ m/^NCL_username\=/) {
+            $line = "NCL_username=$username";
+            $lineedited = 1;
+            last;
+        }
+    }
+    
+    #   If there isn't a username line, add one.
+    if (! $lineedited) {
+        push(@configarray, "NCL_username=$username");
+    }
+}
+
+#   If this is only a config run, then output the new config file and exit.
+#   Otherwise, continue the script
+if ($toconfig) {
+    outputconfig($configfile, @configarray);
+    exit(0);
+}
+undef($toconfig);
+
+#   Configure the main host, and the target username, without storing it.
+my $host1="${username}\@unix.ncl.ac.uk";
+if (! $tuname) {
+    $tuname = $username;
+}
 
 ################################################################################
 #   Find SSH port-forwarding tunnels to make sure none clash
@@ -126,6 +203,7 @@ undef($configfile);
 ################################################################################
 
 #   Grab a list of active port forwarding tunnels that go through unix.ncl.ac.uk
+#   Ignore the preferred port in the config file in favour of the active tunnel
 foreach my $line (split(/\n/, `ps aux | grep -v grep | grep 'ssh.*-L' | grep 'unix.ncl.ac.uk' | sed 's/.*\-L //'`)) {
 
     chomp $line;
@@ -178,10 +256,46 @@ if (! $sshport) {
 
     print "No active tunnel to target found.\nStarting tunnel to $host2\n";
 
-    #   Pick a port with no active tunnel on it.
-    $sshport = int(rand(999) + 4000);
-    until (! $activetunnels{$sshport} && ! $othertunnels{$sshport}) {
+    #   Pick a port with no active tunnel on it, starting with the preferred one
+    if ($forport) {
+        if (! $activetunnels{$forport} && ! $othertunnels{$forport}) {
+            $sshport = $forport;
+        }
+        else {
+            print "Port in use: $forport\nChoosing another.\n";
+        }
+    }
+
+    #   If there's still no targeted SSH port, choose one, then store it as the
+    #   preferred in the config file. This way, other programs and this one
+    #   which cause conflicts with port forwarding will make this one shift to
+    #   accommodate any changes.
+    if (! $sshport) {
+    
         $sshport = int(rand(999) + 4000);
+        until (! $activetunnels{$sshport} && ! $othertunnels{$sshport}) {
+            $sshport = int(rand(999) + 4000);
+        }
+        
+        #   Store the new preferred port
+        my $inlineedited = 0;
+        foreach my $line (@configarray) {
+            if ($line =~ m/\t/) {
+                my ($alias, $hostname, $prefuname, $prefport) 
+                    = split(/\t/, $line);
+                if ($hostname eq $host2) {
+                    $line = "$alias\t$hostname\t$prefuname\t$sshport";
+                    $inlineedited = 1;
+                }
+            }
+        }
+        
+        if (! $inlineedited) {
+            push (@configarray, "\t$host2\t\t$sshport");
+        }
+        
+        $configchanged = 1;
+
     }
 
     #   The command which forwards a port on your machine to Port 22 on Aidan
@@ -189,6 +303,7 @@ if (! $sshport) {
     system("ssh -o ControlMaster=yes "
         ."-o ControlPersist=3600 "
         ."-o ServerAliveInterval=300 "
+        ."-i /home/nolan/.ssh/NCL-key-3 "
         ."-o ControlPath=/tmp/ssh-%u-%h-%p-%r-%n "
         ."-Nf "
         ."-L $sshport:$host2:22 $host1"
@@ -196,6 +311,12 @@ if (! $sshport) {
 }
 else {
     print "Active tunnel to target found on port: $sshport\n";
+}
+
+#   If the config lines have changed, then write the new config to file
+
+if ($configchanged) {
+    outputconfig($configfile, @configarray);
 }
 
 ################################################################################
@@ -218,3 +339,18 @@ elsif ($mode =~ m/out/i) {
         . "\" $out"
     );
 }
+
+################################################################################
+#   Output config file subroutine
+################################################################################
+
+sub outputconfig {
+    my ($configfile, @outlines) = @_;
+    
+    open(my $confoutfh, '>', $configfile) or die "Couldn't open $configfile\n";
+    print $confoutfh join("\n", @outlines);
+    close($confoutfh);
+}
+
+
+
