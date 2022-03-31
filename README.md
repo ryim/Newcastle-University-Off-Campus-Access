@@ -69,8 +69,8 @@ For example: add `alias ssh="ssh -o ServerAliveInterval=300"` to the `~/.profile
 ## Transferring files between your home Linux machine and a server on campus
 (Note: The `nclscp` script mentioned in this section replaces the `rocketscp` script, which is now in the `Archive` folder.)
 
-Rocket, and other servers, do not accept direct SSH connections from elsewhere on the internet.
-In order to get around this, it is necessary to tunnel your SSH connection through AIDAN, since the AIDAN server is able to connect to Rocket and accepts connections from machines not on Newcastle University's network.
+Rocket, and other servers on the NU network, do not accept direct SSH connections from elsewhere on the internet.
+In order to get around this, it is necessary to tunnel your SSH connection through AIDAN, since the AIDAN server is able to connect to these servers, and accepts connections from machines not on Newcastle University's network.
 The `nclscp` script allows you to create an SSH tunnel, and to move files to/from a server through the tunnel.
 
 By default, the tunnel is active for 1 hour.
@@ -85,7 +85,7 @@ The following instructions will get you started with transferring files. It is u
         - The `username` column is used to define usernames other than your campus username, if required. If not needed, two tabs between `hostname` and `port` to denote an empty column are fine.
         - The `port` column is the port on your machine which you want to forward. If you choose one, please ensure that this port is not used by any other service. There is provision for `nclscp` to choose its own ports, if you leave this column blank.
 1. Run `./nclscp -h` to get usage information
-1. Run `./nclscp` to transfer files to/from Rocket.
+1. Run `./nclscp` to transfer files to/from Newcastle University servers, such as Rocket.
 1. Optional: You can add the directory to which you downloaded the `nclscp` script to your $PATH in order to access them without having to specify a path to the location of these scripts.
 If you are running the Bash shell, edit `~/.bashrc` and add the following line, replacing `/path/to/scripts` with the location of the scripts.
 For other shells, add this line to the appropriate script which runs when you start a new shell.
