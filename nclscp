@@ -303,7 +303,6 @@ if (! $sshport) {
     system("ssh -o ControlMaster=yes "
         ."-o ControlPersist=3600 "
         ."-o ServerAliveInterval=300 "
-        ."-i /home/nolan/.ssh/NCL-key-3 "
         ."-o ControlPath=/tmp/ssh-%u-%h-%p-%r-%n "
         ."-Nf "
         ."-L $sshport:$host2:22 $host1"
