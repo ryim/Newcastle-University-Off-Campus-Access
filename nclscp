@@ -30,9 +30,9 @@ my $helpstring =
     ."\n"
     ."Examples\n===============================\n"
     ."Transferring from this machine to Rocket\n"
-    ."nclscp -m in file.txt -o /mnt/nfs/home/username\n\n"
+    ."nclscp -m in -t rocket -o /mnt/nfs/home/username file.txt\n\n"
     ."Transferring from Rocket to this machine\n"
-    ."nclscp -m out file.xls file2.txt -o /home/username/destination\n\n"
+    ."nclscp -m out -t rocket -o /home/username/destination file1.xls file2.txt\n\n"
     ."server names, and their aliases are kept in the nclscp.config file.\n\n"
     ."OPTIONS\n"
     ."\t-h\n\t\tPrint this help text.\n\n"
@@ -162,7 +162,7 @@ undef($aliasfound);
 ################################################################################
 
 if (! $username || $toconfig) {
-    print "Please input your username to unix.ncl.ac.uk.\n>";
+    print "Please input your university username.\n>";
     $username = <STDIN>;
     chomp $username;
     
@@ -191,7 +191,7 @@ if ($toconfig) {
 undef($toconfig);
 
 #   Configure the main host, and the target username, without storing it.
-my $host1="${username}\@unix.ncl.ac.uk";
+my $host1="${username}\@finan.ncl.ac.uk";
 if (! $tuname) {
     $tuname = $username;
 }
@@ -202,9 +202,9 @@ if (! $tuname) {
 #   skip the rest of the search
 ################################################################################
 
-#   Grab a list of active port forwarding tunnels that go through unix.ncl.ac.uk
+#   Grab a list of active port forwarding tunnels that go through finan.ncl.ac.uk
 #   Ignore the preferred port in the config file in favour of the active tunnel
-foreach my $line (split(/\n/, `ps aux | grep -v grep | grep 'ssh.*-L' | grep 'unix.ncl.ac.uk' | sed 's/.*\-L //'`)) {
+foreach my $line (split(/\n/, `ps aux | grep -v grep | grep 'ssh.*-L' | grep 'finan.ncl.ac.uk' | sed 's/.*\-L //'`)) {
 
     chomp $line;
     $line =~ s/^([\w\-\.\:]+)\s.*/$1/;
@@ -219,7 +219,7 @@ foreach my $line (split(/\n/, `ps aux | grep -v grep | grep 'ssh.*-L' | grep 'un
 
 #   Find other tunnels that would take up ports
 if (! $sshport) {
-    foreach my $line (split(/\n/, `ps aux | grep -v grep | grep -v 'unix.ncl.ac.uk' | grep 'ssh.*-L'`)) {
+    foreach my $line (split(/\n/, `ps aux | grep -v grep | grep -v 'finan.ncl.ac.uk' | grep 'ssh.*-L'`)) {
 
         chomp $line;
         $line =~ s/^.*\-L\s+([\w\-\.]+?)\:.*/$1/;
@@ -230,7 +230,7 @@ if (! $sshport) {
 #   Logging
 if (! $sshport) {
     if (%activetunnels) {
-        print "Found active tunnels through unix.ncl.ac.uk:\n";
+        print "Found active tunnels through finan.ncl.ac.uk:\n";
         foreach my $key (keys(%activetunnels)) {
             print "Port: $key\tMachine: $activetunnels{$key}\n";
         }

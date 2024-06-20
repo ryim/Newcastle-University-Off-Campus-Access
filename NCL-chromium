@@ -8,7 +8,7 @@
 #   Global variables
 uname='USERNAME'
 socksport=8956
-server='unix.ncl.ac.uk'
+server='finan.ncl.ac.uk'
 
 #                                                                              #
 ################################################################################
@@ -23,7 +23,7 @@ sockscmd+=" -D $socksport -f -C -q -N $uname@$server"
 #   Find a version of Chrome/Chromium that's installed and not open
 chromapp=''
 open=false
-apps=("chromium-browser-privacy" "chromium-browser" "chromium" "chrome")
+apps=("/snap/bin/chromium" "chromium-browser-privacy" "chromium-browser" "chromium" "chrome")
 for app in ${apps[@]}
 do
     if command -v $app > /dev/null

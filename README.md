@@ -1,6 +1,9 @@
 # Newcastle University Off-Campus Access
 
-This is an UNOFFICIAL repository/guide, aimed at enabling staff/students at Newcastle University to work off-campus more effectively. Please distribute to anyone who could need it. Please report any issues via Github or by emailing richard.yim@newcastle.ac.uk. Any other comments are also welcome through these channnels.
+This is an UNOFFICIAL repository/guide, aimed at enabling staff/students at Newcastle University to work off-campus more effectively.
+Please distribute to anyone who could need it.
+Please report any issues via Github or by emailing me via my work address.
+Any other comments are also welcome through these channnels.
 
 ## Accessing journal articles through Newcastle University's systems, without using /Remote Desktop
 Many journals and publishers restrict full text access to institutions/individuals who have subscriptions.
@@ -13,10 +16,12 @@ The idea of this process is to set up a SOCKS tunnel between your device and a s
 You set your browser up to send all of its traffic through this tunnel to an NU server, and the server then forwards the traffic out to the internet.
 According to the publishers' websites, your device is on the NU campus (your external IP address is an NU address), so they will serve you content without showing you the paywall.
 
-1. Download and install PuTTY from https://www.putty.org.
-1. Launch PuTTY from the Start Menu.
-1. Go to https://linuxize.com/post/how-to-setup-ssh-socks-tunnel-for-private-browsing/. a fifth of the way down the page, there is a section entitled "Windows". This will walk you through setting up your tunnel to any server. 
-    1. In step 1 of the guide, use `unix.ncl.ac.uk` in the Host "Name/IP address" field.
+1.  Download and install PuTTY from https://www.putty.org.
+1.  Launch PuTTY from the Start Menu.
+1.  Go to `https://linuxize.com/post/how-to-setup-ssh-socks-tunnel-for-private-browsing/`.
+    A fifth of the way down the page, there is a section entitled "Windows".
+    This will walk you through setting up your tunnel to any server.
+    1. In step 1 of the guide, use `finan.ncl.ac.uk` in the Host "Name/IP address" field.
     1. Follow the rest of the guide to set your tunnel up, and configure your browser to use the tunnel.
     1. When you are finished, don't forget to reset any browser settings, so that you can use your browser normally in future.
     1. Finally, close PuTTY.
@@ -25,22 +30,39 @@ On Windows, Part 2 of the following guide may help: `https://www.ocf.berkeley.ed
 -->
 
 ### Accessing articles from Linux machines using NCL-chromium
-For Linux users, the `NCL-chromium` Bash script, included in this repository, will automate the process of setting up a tunnel to AIDAN, one of NU's servers, and launch an instance of Chrome/Chromium with the appropriate options. This script has the advantage of tunnelling only a single browser's traffic through your university connection, rather than all of the traffic from your device. This is an early version of this script, so feedback is greatly appreciated.
+For Linux users, the `NCL-chromium` Bash script, included in this repository, will automate the process of setting up a tunnel to Finan, one of NU's servers, and launch an instance of Chrome/Chromium with the appropriate options.
+This script has the advantage of tunnelling only a single browser's traffic through your university connection, rather than all of the traffic from your device.
+This is an early version of this script, so feedback is greatly appreciated.
 
 #### Prerequisites
-`NCL-chromium` requires that at least one of: Chrome, Chromium, or Chromium Browser Privacy is installed, and is launchable from the terminal using one of the following commands: `"chromium-browser-privacy", "chromium-browser", "chromium", "chrome"`.
+`NCL-chromium` requires that at least one of: Chrome, Chromium, or Chromium Browser Privacy is installed, and is launchable from the terminal using one of the following commands:
+
+```
+/snap/bin/chromium
+chromium-browser-privacy
+chromium-browser
+chromium
+chrome
+```
 
 #### Usage
-1. Download a copy of NCL-chromium
-1. Open it in a text editor. Replace `USERNAME` on line 9 with your NU username, then save it.
-1. Make sure that Chrome/Chromium isn't open
-1. Navigate to the location of NCL-chromium in your terminal, and launch the script with `./NCL-chromium`
-1. Enter your NU password during SOCKS tunnel setup. The browser should launch automatically.
+1.  Download a copy of NCL-chromium
+1.  Open it in a text editor.
+    Replace `USERNAME` on line 9 with your NU username, then save it.
+1.  Make sure that Chrome/Chromium isn't open
+1.  Launch the script with `/path/to/NCL-chromium`
+1.  Enter your NU password during SOCKS tunnel setup.
+    The browser should launch automatically.
 
-Once this is done, the script will create a process in the background. This process checks to see if the browser is still running, once a minute. If the browser is closed, then the process will kill the SOCKS tunnel without you having to do anything.
+Once this is done, the script will create a process in the background.
+This process checks to see if the browser is still running, once a minute.
+If the browser is closed, then the process will kill the SOCKS tunnel without you having to do anything.
 
 ## Accessing Rocket via an SSH connection from outside the university
-NUIT has provided the following helpful guide: https://services.ncl.ac.uk/itservice/research/hpc/remoteaccess/
+NUIT has provided the following helpful guide: [https://services.ncl.ac.uk/itservice/research/hpc/remoteaccess/](https://services.ncl.ac.uk/itservice/research/hpc/remoteaccess/)
+
+The current gateway server for Newcastle University is `finan.ncl.ac.uk`.
+
 <!--Rocket does not accept SSH connections from elsewhere on the internet, but AIDAN, one of NU's web-facing servers, does.-->
 <!--One can connect to AIDAN via SSH, then SSH from AIDAN into Rocket.-->
 <!--This can be done for other servers behind the NU firewall, as well.-->
